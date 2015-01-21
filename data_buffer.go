@@ -8,10 +8,12 @@ import (
 // 使用sync.Pool 对make([]byte,n) 进行内存重用
 // 尽量减少gc时间
 var (
-	bufMap map[int]*sync.Pool = make(map[int]*sync.Pool)
+	bufMap   map[int]*sync.Pool = make(map[int]*sync.Pool)
+	poolLock sync.RWMutex       = sync.RWMutex{}
 )
 
 func getMatchSize(size int) (ret int) {
+
 	// 找到合适的大小
 	if size <= SLOT_INIT_SIZE {
 		if size%SLOT_GIP == 0 {
@@ -48,10 +50,17 @@ func getPool(size int) (pool *sync.Pool) {
 	// 	log.Debug("buf cache size=", key)
 
 	// }
-
+	var tmpPool *sync.Pool
 	if pool = bufMap[size]; pool == nil {
+		poolLock.Lock()
+		defer poolLock.Unlock()
 		pool = &sync.Pool{}
-		bufMap[size] = pool
+		if tmpPool = bufMap[size]; tmpPool == nil {
+			// 再次判断一下map 里是否已经有了，
+			bufMap[size] = pool
+		} else {
+			pool = tmpPool
+		}
 	}
 	return
 }
@@ -62,6 +71,7 @@ func GetBuffer(size int) (byteSlic []byte) {
 
 	if v := getPool(matchSize).Get(); v != nil {
 		byteSlic = v.([]byte)
+
 		byteSlic = byteSlic[0:size]
 		return
 	}
