@@ -15,34 +15,34 @@ var (
 func getMatchSize(size int) (ret int) {
 
 	// 找到合适的大小
-	if size <= SLOT_INIT_SIZE {
-		if size%SLOT_GIP == 0 {
+	if size <= SLAB_INIT_SIZE {
+		if size%SLAB_GIP == 0 {
 			return size
 		}
-		return (size/SLOT_GIP + 1) * SLOT_GIP
+		return (size/SLAB_GIP + 1) * SLAB_GIP
 	}
-	return getMatchSlotSize(size)
+	return getMatchSlabSize(size)
 }
 
 const (
-	SLOT_GIP = 8 // 当大小小于SLOT_INIT_SIZE byte时，所需内存按每SLOT_GIP byte 递增
+	SLAB_GIP = 8 // 当大小小于SLAB_INIT_SIZE byte时，所需内存按每SLAB_GIP byte 递增
 
-	SLOT_RATIO     = 120 // 120 means 1.2,must >100
-	SLOT_INIT_SIZE = 512
-	// SLOT_TRY_CNT   = 16
+	GROWTH_FACTOR  = 125 // 125 means 1.25,must >100
+	SLAB_INIT_SIZE = 512
+	// SLAB_TRY_CNT   = 16
 )
 
-func getMatchSlotSize(size int) (slotSize int) {
-	slotSize = SLOT_INIT_SIZE
+func getMatchSlabSize(size int) (slabSize int) {
+	slabSize = SLAB_INIT_SIZE
 	for {
-		// for i := 0; i < SLOT_TRY_CNT; i++ {
-		slotSize = slotSize * SLOT_RATIO / 100
-		if size > slotSize {
+		// for i := 0; i < SLAB_TRY_CNT; i++ {
+		slabSize = slabSize * GROWTH_FACTOR / 100
+		if size > slabSize {
 			continue
 		}
-		return slotSize
+		return slabSize
 	}
-	// return 0 // 0 means ,doesnot find match slot
+	// return 0 // 0 means ,doesnot find match slab
 }
 
 func getPool(size int) (pool *sync.Pool) {
