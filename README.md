@@ -12,5 +12,8 @@
      data:=databuffer.GetBuffer(dataSize)
      // do something
      databuffer.PutBuffer(data) // 把data 这块内存放到缓存中
-  ```
-  
+     ```
+     
+# link
+  http://blog.csdn.net/tiaotiaoyly/article/details/38388081
+  http://my.oschina.net/lubia/blog/175154
