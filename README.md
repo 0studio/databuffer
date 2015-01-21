@@ -4,15 +4,16 @@
  尽量减少gc时间
  如果没有 databuffer
  则使用方式是
-  ```
+```
      data:=make([]byte,dataSize)
-  ```
+```
   有了databuffer 以后的使用是
-  ```
+
+```
      data:=databuffer.GetBuffer(dataSize)
      // do something
      databuffer.PutBuffer(data) // 把data 这块内存放到缓存中
-     ```
+```
      
 # link
   http://blog.csdn.net/tiaotiaoyly/article/details/38388081
